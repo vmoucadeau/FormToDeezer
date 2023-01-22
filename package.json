@@ -1,0 +1,23 @@
+{
+  "name": "formtodeezer",
+  "version": "1.0.0",
+  "description": "Retreive Google Forms responses and add music titles in a Deezer playlist",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vmoucadeau/formtodeezer.git"
+  },
+  "author": "Vincent MOUCADEAU",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vmoucadeau/formtodeezer/issues"
+  },
+  "homepage": "https://github.com/vmoucadeau/formtodeezer#readme",
+  "dependencies": {
+    "deezer-js": "^1.3.8",
+    "googleapis": "^110.0.0"
+  }
+}
