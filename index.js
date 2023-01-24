@@ -68,27 +68,50 @@ async function addToDeezer(titles) {
   
   for(var i = 0; i < titles.length; i++) {
       var search = await deezer_client.api.search_track(titles[i], {limit: 1});
-      var trackId = search.data[0].id;
-      var result = await deezer_client.gw.add_song_to_playlist(process.env.DEEZER_PLAYLIST, trackId);
-      if(result.error) {
-          console.log("Error adding song: " + titles[i]);
+      if(search.total == 0) {
+          console.log("Song not found: " + titles[i]);
+          continue;
       }
-      else {
-          console.log("Added song: " + titles[i]);
+      try {
+        var trackId = search.data[0].id;
+        var result = await deezer_client.gw.add_song_to_playlist(process.env.DEEZER_PLAYLIST, trackId);
+        if(result.error) {
+            console.log("Error adding song: " + titles[i]);
+        }
+        else {
+            console.log("Added song: " + titles[i]);
+        }
+      }
+      catch(err) {
+          console.log(err);
       }
   }
 }
 
-// setInterval(async function() {
-//   console.log("Checking for new answers...");  
-//   var answers = await getAnswers();
-//   for(var i = 0; i < answers.length; i++) {
-//       if(!addedAnswers.includes(answers[i].responseId)) {
-//           addedAnswers.push(answers[i].responseId);
-//           console.log("Added answer: " + answers[i].responseId);
-//       }
-//   }
-//   fs.writeFileSync("answers.json", JSON.stringify(addedAnswers), function (err, file) {
-//       if (err) throw err;
-//   });
-// }, 3000);
+
+setInterval(async function() {
+  console.log("Checking for new answers...");  
+  try {
+    var answers = await getAnswers();
+    if(!answers) {console.log("No answers"); return;}
+    for(var i = 0; i < answers.length; i++) {
+        if(!addedAnswers.includes(answers[i].responseId)) {
+            addedAnswers.push(answers[i].responseId);
+            console.log("Added answer: " + answers[i].responseId);
+            var titles = [];
+            for(answer in answers[i].answers) {
+              var trackName = answers[i].answers[answer].textAnswers.answers[0].value;
+              titles.push(trackName);
+            }
+            await addToDeezer(titles);
+        }
+    }
+  }
+  catch(err) {
+    console.log(err);
+  }
+    
+  fs.writeFileSync("answers.json", JSON.stringify(addedAnswers), function (err, file) {
+      if (err) throw err;
+  });
+}, 2000);
